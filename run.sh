@@ -7,7 +7,7 @@
 # ANTHROPIC_AUTH_TOKEN / ANTHROPIC_API_KEY are prompted interactively (not stored in shell history)
 #
 # Optional:
-#   CLAUDE_IMAGE  — image, default ghcr.io/go-bai/claude-debug:2.1.117
+#   CLAUDE_IMAGE  — image, default ghcr.io/go-bai/claude-debug:latest
 #   RUNTIME       — force runtime: nerdctl or docker
 
 set -e
@@ -30,13 +30,6 @@ if [ -z "$ANTHROPIC_AUTH_TOKEN" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
   echo
 fi
 
-TMPENV=$(mktemp)
-chmod 600 "$TMPENV"
-trap 'rm -f "$TMPENV"' EXIT
-
-[ -n "$ANTHROPIC_AUTH_TOKEN" ] && echo "ANTHROPIC_AUTH_TOKEN=${ANTHROPIC_AUTH_TOKEN}" >> "$TMPENV"
-[ -n "$ANTHROPIC_API_KEY"    ] && echo "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}"       >> "$TMPENV"
-
 echo "Runtime: $CTR  Image: $IMAGE"
 
 exec "$CTR" run --rm -it \
@@ -45,7 +38,8 @@ exec "$CTR" run --rm -it \
   --ipc host \
   --privileged \
   -v /:/host \
-  --env-file "$TMPENV" \
+  ${ANTHROPIC_AUTH_TOKEN:+--env ANTHROPIC_AUTH_TOKEN} \
+  ${ANTHROPIC_API_KEY:+--env ANTHROPIC_API_KEY} \
   ${ANTHROPIC_BASE_URL:+-e ANTHROPIC_BASE_URL="$ANTHROPIC_BASE_URL"} \
   ${ANTHROPIC_MODEL:+-e ANTHROPIC_MODEL="$ANTHROPIC_MODEL"} \
   ${ANTHROPIC_SMALL_FAST_MODEL:+-e ANTHROPIC_SMALL_FAST_MODEL="$ANTHROPIC_SMALL_FAST_MODEL"} \

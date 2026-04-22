@@ -62,6 +62,6 @@ The image includes userspace RDMA tools. With `--privileged --network host`, the
 
 ## Security
 
-`ANTHROPIC_AUTH_TOKEN` is read via `read -s` and written to a `chmod 600` temp file, then passed to the container via `--env-file`. It never appears in `ps aux` or shell history.
+`ANTHROPIC_AUTH_TOKEN` is read via `read -s` and passed to the container via `--env ANTHROPIC_AUTH_TOKEN` (no value on the command line). It never appears in `ps aux` or shell history.
 
 Note: the token remains visible in `docker inspect` / `nerdctl inspect` and `/proc/<pid>/environ` inside the container — inherent to how container environment variables work.
