@@ -20,13 +20,13 @@ Push to the `main` branch triggers a GitHub Actions workflow that:
 ## Usage
 
 ```bash
-# Set non-sensitive vars via export
+# Set non-sensitive vars via export (optional)
 export ANTHROPIC_BASE_URL=https://your-proxy.internal
 export ANTHROPIC_MODEL=claude-opus-4-7
 export ANTHROPIC_SMALL_FAST_MODEL=claude-haiku-4-5-20251001
 
 # Run — token is prompted interactively and never written to shell history
-./run.sh
+bash <(curl -fsSL https://raw.githubusercontent.com/go-bai/claude-debug/main/run.sh)
 ```
 
 ### Environment variables
@@ -38,7 +38,7 @@ export ANTHROPIC_SMALL_FAST_MODEL=claude-haiku-4-5-20251001
 | `ANTHROPIC_BASE_URL` | No | API proxy endpoint |
 | `ANTHROPIC_MODEL` | No | Primary model |
 | `ANTHROPIC_SMALL_FAST_MODEL` | No | Fast/cheap model for background tasks |
-| `CLAUDE_IMAGE` | No | Override image, default `ghcr.io/go-bai/claude-debug:2.1.117` |
+| `CLAUDE_IMAGE` | No | Override image, default `ghcr.io/go-bai/claude-debug:latest` |
 | `RUNTIME` | No | Force `nerdctl` or `docker` |
 
 ## Host access
