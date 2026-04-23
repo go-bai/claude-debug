@@ -31,6 +31,9 @@ if [ -z "$ANTHROPIC_AUTH_TOKEN" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
   export ANTHROPIC_AUTH_TOKEN
 fi
 
+KUBE_MOUNT=()
+[ -d /root/.kube ] && KUBE_MOUNT=(-v /root/.kube:/home/claude/.kube:ro)
+
 echo "Runtime: $CTR  Image: $IMAGE"
 
 exec "$CTR" run --rm -it \
@@ -39,6 +42,7 @@ exec "$CTR" run --rm -it \
   --ipc host \
   --privileged \
   -v /:/host \
+  "${KUBE_MOUNT[@]}" \
   ${ANTHROPIC_AUTH_TOKEN:+--env ANTHROPIC_AUTH_TOKEN} \
   ${ANTHROPIC_API_KEY:+--env ANTHROPIC_API_KEY} \
   ${ANTHROPIC_BASE_URL:+--env ANTHROPIC_BASE_URL} \
