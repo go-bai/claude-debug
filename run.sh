@@ -32,7 +32,13 @@ if [ -z "$ANTHROPIC_AUTH_TOKEN" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
 fi
 
 KUBE_MOUNT=()
-[ -d /root/.kube ] && KUBE_MOUNT=(-v /root/.kube:/home/claude/.kube:ro)
+if [ -f /root/.kube/config ]; then
+  TMPKUBE=$(mktemp -d)
+  cp /root/.kube/config "$TMPKUBE/config"
+  chmod 644 "$TMPKUBE/config"
+  trap 'rm -rf "$TMPKUBE"' EXIT
+  KUBE_MOUNT=(-v "$TMPKUBE/config":/home/claude/.kube/config:ro)
+fi
 
 HOST_PATH=$(echo "$PATH" | tr ':' '\n' | sed 's|^|/host|' | tr '\n' ':')
 
