@@ -34,6 +34,8 @@ fi
 KUBE_MOUNT=()
 [ -d /root/.kube ] && KUBE_MOUNT=(-v /root/.kube:/home/claude/.kube:ro)
 
+HOST_PATH=$(echo "$PATH" | tr ':' '\n' | sed 's|^|/host|' | tr '\n' ':')
+
 echo "Runtime: $CTR  Image: $IMAGE"
 
 exec "$CTR" run --rm -it \
@@ -42,10 +44,12 @@ exec "$CTR" run --rm -it \
   --ipc host \
   --privileged \
   -v /:/host \
+  -v /etc/hosts:/etc/hosts:ro \
   "${KUBE_MOUNT[@]}" \
   ${ANTHROPIC_AUTH_TOKEN:+--env ANTHROPIC_AUTH_TOKEN} \
   ${ANTHROPIC_API_KEY:+--env ANTHROPIC_API_KEY} \
   ${ANTHROPIC_BASE_URL:+--env ANTHROPIC_BASE_URL} \
   ${ANTHROPIC_MODEL:+--env ANTHROPIC_MODEL} \
   ${ANTHROPIC_SMALL_FAST_MODEL:+--env ANTHROPIC_SMALL_FAST_MODEL} \
+  -e PATH="${HOST_PATH}${PATH}" \
   "$IMAGE"
