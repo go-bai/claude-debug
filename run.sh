@@ -28,6 +28,7 @@ fi
 if [ -z "$ANTHROPIC_AUTH_TOKEN" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
   read -rsp "ANTHROPIC_AUTH_TOKEN: " ANTHROPIC_AUTH_TOKEN
   echo
+  export ANTHROPIC_AUTH_TOKEN
 fi
 
 echo "Runtime: $CTR  Image: $IMAGE"
