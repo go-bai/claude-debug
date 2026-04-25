@@ -12,7 +12,18 @@
 
 set -e
 
-IMAGE="${CLAUDE_IMAGE:-ghcr.io/go-bai/claude-debug:latest}"
+if [ -n "$CLAUDE_IMAGE" ]; then
+  IMAGE="$CLAUDE_IMAGE"
+else
+  BASE_IMAGE="ghcr.io/go-bai/claude-debug:latest"
+  COUNTRY=$(curl -sf --max-time 5 https://ipinfo.io/country 2>/dev/null)
+  if [ "$COUNTRY" = "CN" ]; then
+    IMAGE="m.daocloud.io/${BASE_IMAGE}"
+    echo "China detected, using mirror: $IMAGE"
+  else
+    IMAGE="$BASE_IMAGE"
+  fi
+fi
 
 if [ -n "$RUNTIME" ]; then
   CTR="$RUNTIME"
