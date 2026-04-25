@@ -38,7 +38,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/go-bai/claude-debug/main/run
 | `ANTHROPIC_BASE_URL` | No | API proxy endpoint |
 | `ANTHROPIC_MODEL` | No | Primary model |
 | `ANTHROPIC_SMALL_FAST_MODEL` | No | Fast/cheap model for background tasks |
-| `CLAUDE_IMAGE` | No | Override image; auto-uses `m.daocloud.io` mirror when in China |
+| `CLAUDE_IMAGE` | No | Override image, default `ghcr.io/go-bai/claude-debug:latest` |
 | `RUNTIME` | No | Force `nerdctl` or `docker` |
 
 ## Host access
