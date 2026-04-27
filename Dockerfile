@@ -25,5 +25,4 @@ USER claude
 
 WORKDIR /host
 
-ENTRYPOINT ["claude"]
-CMD ["--dangerously-skip-permissions"]
+CMD ["sleep", "infinity"]
