@@ -31,20 +31,35 @@ if [ -z "$ANTHROPIC_AUTH_TOKEN" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
   export ANTHROPIC_AUTH_TOKEN
 fi
 
+CLEANUP=()
+trap 'rm -rf "${CLEANUP[@]}"' EXIT
+
 KUBE_MOUNT=()
 if [ -f /root/.kube/config ]; then
   TMPKUBE=$(mktemp -d)
   cp /root/.kube/config "$TMPKUBE/config"
-  chmod 644 "$TMPKUBE/config"
-  trap 'rm -rf "$TMPKUBE"' EXIT
+  chown 1001:1001 "$TMPKUBE/config"
+  chmod 600 "$TMPKUBE/config"
+  CLEANUP+=("$TMPKUBE")
   KUBE_MOUNT=(-v "$TMPKUBE/config":/home/claude/.kube/config:ro)
+fi
+
+SSH_MOUNT=()
+if [ -d /root/.ssh ]; then
+  TMPSSH=$(mktemp -d)
+  cp -r /root/.ssh/. "$TMPSSH/"
+  chown -R 1001:1001 "$TMPSSH"
+  chmod 700 "$TMPSSH"
+  find "$TMPSSH" -maxdepth 1 -name "*.pub" -o -name "known_hosts" | xargs -r chmod 644
+  CLEANUP+=("$TMPSSH")
+  SSH_MOUNT=(-v "$TMPSSH":/home/claude/.ssh)
 fi
 
 HOST_PATH=$(echo "$PATH" | tr ':' '\n' | sed 's|^|/host|' | tr '\n' ':')
 
 echo "Runtime: $CTR  Image: $IMAGE"
 
-exec "$CTR" run --rm -it \
+"$CTR" run --rm -it \
   --network host \
   --pid host \
   --ipc host \
@@ -52,6 +67,7 @@ exec "$CTR" run --rm -it \
   -v /:/host \
   -v /etc/hosts:/etc/hosts:ro \
   "${KUBE_MOUNT[@]}" \
+  "${SSH_MOUNT[@]}" \
   ${ANTHROPIC_AUTH_TOKEN:+--env ANTHROPIC_AUTH_TOKEN} \
   ${ANTHROPIC_API_KEY:+--env ANTHROPIC_API_KEY} \
   ${ANTHROPIC_BASE_URL:+--env ANTHROPIC_BASE_URL} \
